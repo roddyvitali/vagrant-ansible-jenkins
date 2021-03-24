@@ -1,0 +1,21 @@
+---
+- hosts: server-jenkins
+  remote_user: root
+  tasks:
+    - name: Install JAVA
+      apt: name=openjdk-8-jdk update_cache=yes
+      become: yes
+    - name: Jenkins Key
+      apt_key: url=https://pkg.jenkins.io/debian/jenkins.io.key state=present
+      become: yes
+    - name: Jenkins Repo
+      apt_repository: repo='deb https://pkg.jenkins.io/debian binary/' state=present
+      become: yes
+    - name: Install Jenkins
+      apt: name=jenkins state=present
+      become: yes
+    - name: Show Initial Admin Password
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
+      become: yes
+      register: initialAdminPassword
+    - debug: msg="initialAdminPassword {{ ansible_ssh_host }} - {{ initialAdminPassword.stdout }}"
